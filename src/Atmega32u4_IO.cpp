@@ -16,15 +16,31 @@ Created by RobotCing Team
 
 //--------------------------------------------
 #include "Arduino.h"
-#include "Atmega328_IO.h"
+#include "Atmega32u4_IO.h"
+//--------------------------------------------
+//            Definitions
+//--------------------------------------------
+#define FrontSensor 15
+#define LightSensor1 A6
+#define LightSensor2 A11
+#define ShineArray1 A8
+#define ShineArray2 13
+#define potentiometer A7
+#define RECV_PIN A3
+#define motorA 14
+#define motorB 16
+#define INA1 7
+#define INA2 A5
+#define INB1 A4
+#define INB2 9
+#define Button 11
 //--------------------------------------------
 Cing::Cing(){}
 //--------------------------------------------
 //            Neopixel setup
 //--------------------------------------------
-#define PIN 13
 #define Neopixels 120
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(Neopixels, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(Neopixels, FrontSensor, NEO_GRB + NEO_KHZ800);
 //--------------------------------------------
 //            Gyro setup
 //--------------------------------------------
@@ -32,13 +48,11 @@ MPU6050 mpu6050(Wire);
 //--------------------------------------------
 //            DS18B20 Setup
 //--------------------------------------------
-#define ONE_WIRE_BUS 13
-OneWire oneWire(ONE_WIRE_BUS);
+OneWire oneWire(FrontSensor);
 DallasTemperature sensors(&oneWire);
 //--------------------------------------------
 //               IR Setup
 //--------------------------------------------
-#define RECV_PIN 4
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 //--------------------------------------------
@@ -46,12 +60,6 @@ decode_results results;
 //--------------------------------------------
 void Cing::RunMotor(String motor,int speed,String mode)
 	{
-		 #define motorA 12
-		 #define motorB 11
-		 #define INA1 10
-		 #define INA2 9
-		 #define INB1 8
-		 #define INB2 7
 		 pinMode(motorA,OUTPUT);
 		 pinMode(motorB,OUTPUT);
 		 //---------------------
@@ -165,11 +173,8 @@ void Cing::RunMotor(String motor,int speed,String mode)
 //--------------------------------------------
 //                  LightSensor
 //--------------------------------------------
-
 int Cing::ReadLightSensor(int sensor,String mode)
 	{
-		#define LightSensor1 A2
-		#define LightSensor2 A3
 		pinMode(LightSensor1,INPUT);//1
 		pinMode(LightSensor2,INPUT);//2
 		if (mode=="analog")
@@ -212,33 +217,17 @@ int Cing::ReadLightSensor(int sensor,String mode)
 //--------------------------------------------
 //           UltrasonicSensor
 //--------------------------------------------
-
 int Cing::ReadUltrasonicSensor()
 	{
-		#define UltrasonicSensor 13
-		int duration;
-		int distance;
-		pinMode(UltrasonicSensor, OUTPUT);
-		digitalWrite(UltrasonicSensor, LOW);
-		delayMicroseconds(2);
-		digitalWrite(UltrasonicSensor, HIGH);
-		delayMicroseconds(10);
-		digitalWrite(UltrasonicSensor, LOW);
-		delayMicroseconds(10);
-		pinMode(UltrasonicSensor, INPUT);
-		duration = pulseIn(UltrasonicSensor, HIGH);
-		distance = duration/58.2;
-		return distance;
+
 	}
 //--------------------------------------------
 //             ShineSensors
 //--------------------------------------------
 int Cing::ReadShineSensor()
 	{
-		#define ShineSensor 13
-		pinMode(ShineSensor,INPUT);
-		int shine_value;
-		int shine_value = map(digitalRead(ShineSensor),0,1,0,100);
+		pinMode(FrontSensor,INPUT);
+		int shine_value = map(digitalRead(FrontSensor),0,1,0,100);
 		return shine_value;
 	}
 //--------------------------------------------
@@ -246,7 +235,6 @@ int Cing::ReadShineSensor()
 //--------------------------------------------
 bool Cing::ReadButton()
 	{
-		#define Button A6
 		bool button_value;
 		if(analogRead(Button)>1000){
 			button_value = 1;
@@ -261,9 +249,8 @@ bool Cing::ReadButton()
 //--------------------------------------------
 bool Cing::ReadButtonExternal()
   {
-		#define button_external 13
-		pinMode(button_external,INPUT);
-		bool button_external_value = digitalRead(button_external);
+		pinMode(FrontSensor,INPUT);
+		bool button_external_value = digitalRead(FrontSensor);
 		return button_external_value;
   }
 //--------------------------------------------
@@ -271,7 +258,6 @@ bool Cing::ReadButtonExternal()
 //--------------------------------------------
 int Cing::ReadPotentiometer()
   {
-		#define potentiometer A1
 		int potentiometer_value = map(analogRead(potentiometer),0,1023,0,100);
 		return potentiometer_value;
 	}
@@ -311,12 +297,12 @@ void Cing::ShowLed()
 //--------------------------------------------
 //                  Gyro
 //--------------------------------------------
-void Cing::StartGyro(bool gyro_off){
+void Cing::InitGyro(bool gyro_off){
 	Wire.begin();
   mpu6050.begin();
   mpu6050.calcGyroOffsets(gyro_off);
 }
-float Cing::InitGyro(String axis,int mode){
+float Cing::ReadGyro(String axis,int mode){
 	mpu6050.update();
 	if(mode == "angle"){
 		if(axis == "x" || axis == "X"){
@@ -341,12 +327,13 @@ float Cing::InitGyro(String axis,int mode){
 		}
 	}
 }
+
 //--------------------------------------------
 //                  Shine Array
 //--------------------------------------------
 int Cing::ReadShineArray(int sensor){
-  int value1 = map(analogRead(A6),0,1023,0,100);
-  int value2 = map(analogRead(A7),0,1023,0,100);
+  int value1 = map(analogRead(ShineArray1),0,1023,0,100);
+  int value2 = map(analogRead(ShineArray2),0,1023,0,100);
   if(sensor == 1){
     return value1;
   }
@@ -358,11 +345,11 @@ int Cing::ReadShineArray(int sensor){
 //               Show Sensors
 //--------------------------------------------
 void Cing::InitTest(){
-	StartLed();
+	InitLed();
 	Wire.begin();
 	Serial.begin(115200);
 	if(Check(0x68)=="Ok"){
-		StartGyro();
+		InitGyro();
 	}
 
 }
