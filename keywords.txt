@@ -1,0 +1,37 @@
+/*
+Created by RobotCing Team
+*/
+#######################################
+# Syntax Coloring Map For Atmega32u4_IO
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+Atmega32u4_IO	                   KEYWORD1
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+Cing                           KEYWORD2
+RunMotor					             KEYWORD2
+ReadLightSensor				         KEYWORD2
+ReadUltrasonicSensor		       KEYWORD2
+ReadShineSensor				         KEYWORD2
+ReadButton    				         KEYWORD2
+ReadButtonExternal		         KEYWORD2
+ReadPotentiometer       	     KEYWORD2
+ReadTempSensor			           KEYWORD2
+InitLed  		                   KEYWORD2
+SetLedColor		                 KEYWORD2
+ShowLed			                   KEYWORD2
+ReadColorSensor                KEYWORD2
+InitGyro                       KEYWORD2
+ReadGyro                       KEYWORD2
+ReadShineArray                 KEYWORD2
+Test                           KEYWORD2
+InitTest                       KEYWORD2
+InitIR                         KEYWORD2
+ReadIR                         KEYWORD2
+#######################################
+# Constants (LITERAL1)
+#######################################
