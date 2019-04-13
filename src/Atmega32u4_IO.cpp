@@ -13,6 +13,7 @@ Created by RobotCing Team
 #include <MPU6050_tockn.h>
 #include <Wire.h>
 #include <IRremote.h>
+#include <VL53L0X.h>
 
 //--------------------------------------------
 #include "Arduino.h"
@@ -45,6 +46,10 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(Neopixels, FrontSensor, NEO_GRB + N
 //            Gyro setup
 //--------------------------------------------
 MPU6050 mpu6050(Wire);
+//--------------------------------------------
+//            VL53L0X setup
+//--------------------------------------------
+VL53L0X sensor;
 //--------------------------------------------
 //            DS18B20 Setup
 //--------------------------------------------
@@ -305,17 +310,17 @@ void Cing::InitGyro(bool gyro_off){
   mpu6050.begin();
   mpu6050.calcGyroOffsets(gyro_off);
 }
-int Cing::ReadGyro(String axis,int mode){
+float Cing::ReadGyro(String axis,int mode){
 	mpu6050.update();
 	if(mode == "angle"){
 		if(axis == "x" || axis == "X"){
-			return mpu6050.getGyroAngleX();
+			return int(mpu6050.getGyroAngleX());
 		}
 		else if(axis == "y" || axis == "Y"){
-			return mpu6050.getGyroAngleY();
+			return int(mpu6050.getGyroAngleY());
 		}
 		else if(axis == "z" || axis == "Z"){
-			return mpu6050.getGyroAngleZ();
+			return int(mpu6050.getGyroAngleZ());
 		}
 	}
 	else{
@@ -354,7 +359,9 @@ void Cing::InitTest(){
 	if(Check(0x68)=="Ok"){
 		InitGyro();
 	}
-
+	if(Check(0x29)=="Ok"){
+		InitLidar();
+	}
 }
 void Cing::Test(String mode){
 	SetLedColor(1,0,0,0);
@@ -407,8 +414,14 @@ void Cing::Test(String mode){
 	if(err_ultra == 1){
 		Serial.println("Fail");
 	}
-
-	Serial.println(Check(0x29));//Lidar
+	//Lidar
+	if(Check(0x29)=="Ok"){
+		Serial.print(ReadLidar());
+		Serial.println(" mm");
+	}
+	else{
+		Serial.println("Fail");
+	}
 	Serial.println(ReadTempSensor());//TempSensor
 	Serial.println(Check(0x77));//Barometric Pressure Sensor
 	Serial.println(Check(0x77));//Altitude Sensor
@@ -469,6 +482,17 @@ void Cing::SetIRValue(){
 int Cing::ReadIR(){
 	SetIRValue();
 	return irvalue;
+}
+//--------------------------------------------
+//                  Lidar
+//--------------------------------------------
+void Cing::InitLidar(){
+	sensor.init();
+  sensor.setTimeout(500);
+	sensor.setMeasurementTimingBudget(50000);
+}
+int Cing::ReadLidar(){
+	return sensor.readRangeSingleMillimeters();
 }
 //--------------------------------------------
 //                  ColorSensor
