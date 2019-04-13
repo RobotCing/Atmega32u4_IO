@@ -34,6 +34,8 @@ class Cing
     int ReadIR();
     void InitLidar();
     int ReadLidar();
+    void InitServo();
+    void SetServo(int angle = 0);
 // local variables
   private:
     void sendMessage();

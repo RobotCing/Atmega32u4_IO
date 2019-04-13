@@ -14,6 +14,7 @@ Created by RobotCing Team
 #include <Wire.h>
 #include <IRremote.h>
 #include <VL53L0X.h>
+#include <Servo.h>
 
 //--------------------------------------------
 #include "Arduino.h"
@@ -37,6 +38,11 @@ Created by RobotCing Team
 #define Button 11
 //--------------------------------------------
 Cing::Cing(){}
+//--------------------------------------------
+//             Servo setup
+//--------------------------------------------
+#define Servo_C A10
+Servo ServoC;
 //--------------------------------------------
 //            Neopixel setup
 //--------------------------------------------
@@ -493,6 +499,16 @@ void Cing::InitLidar(){
 }
 int Cing::ReadLidar(){
 	return sensor.readRangeSingleMillimeters();
+}
+//--------------------------------------------
+//                  Servo
+//--------------------------------------------
+void Cing::InitServo(){
+	ServoC.attach(Servo_C);
+}
+void Cing::SetServo(int angle_in){
+	int angle = constrain(map(angle_in,-90,90,0,180),0,180);
+	ServoC.write(angle);
 }
 //--------------------------------------------
 //                  ColorSensor
